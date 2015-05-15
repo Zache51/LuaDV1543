@@ -1,5 +1,5 @@
+
 #include "lua.hpp"
-#include "stdafx.h"
 #include <iostream>
 #include <SFML\Graphics.hpp>
 
