@@ -1,0 +1,9 @@
+Implementera ett enklare spel som på olika sätt kan påverkas, styras och editeras med hjälp av Lua-skript.
+
+Följande aspekter måste uppfyllas för att uppgiften skall godkännas:
+	1. Spelet skall implementeras i C++ och Lua där Lua-interpretatorn körs med C++ programmet som värd.
+	2. All spellogik skall implementeras i Lua.
+	3. Anrop till funktioner i Lua-miljön från C++ skall förekomma.
+	4. C++-funktioner skall registreras till Lua-miljön som anropas från skriptet.
+	5. En editor skall implementeras där någon form av tillstånd kan skapas till spelet (som bandesign).
+	6. Det tillstånd (t.ex bana) som skapas i leveleditorn skall kunna sparas och laddas in i spelet via ett egendefinierat filformat.

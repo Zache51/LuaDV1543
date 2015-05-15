@@ -1,4 +1,5 @@
 #include "lua.hpp"
+#include <SFML\Graphics.hpp>
 
 int main(void)
 {
