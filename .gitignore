@@ -29,3 +29,6 @@
 # LuaDV1543
 *.log
 *.tlog
+*.suo
+*.sdf
+*.opensdf
