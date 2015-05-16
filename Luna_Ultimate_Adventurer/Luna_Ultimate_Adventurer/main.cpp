@@ -21,14 +21,6 @@ CircleShape player = CircleShape(10.f);
 RenderWindow window = RenderWindow(VideoMode(1200, 800), "Luna the Ultimate Adventurer");
 Text text;
 
-int print(lua_State* L)
-{
-	string msg = lua_tostring(L, 1);
-	lua_pop(L, 1);
-	cout << msg;
-	return 0;
-}
-
 Color getOC(Object id)
 {
 	switch (id)
@@ -86,6 +78,16 @@ int DrawPlayer(lua_State * L)
 	return 0;
 }
 
+int MovePlayer(lua_State* L)
+{
+	float posX = lua_tonumber(L, 1);
+	float posY = lua_tonumber(L, 2);
+	lua_pop(L, 2);
+
+	player.setPosition(posX, posY);
+	return 0;
+}
+
 int main()
 {
 	/***************************************************** "Load Lua" *****************************************************/
@@ -95,7 +97,7 @@ int main()
 	int error = luaL_loadfile(L, "gamelogic.lua") || lua_pcall(L, 0, 0, 0);
 	if (error)
 	{
-		cerr << "unable to run:" << lua_tostring(L, -1) << endl;
+		cerr << "unable to run: load: " << lua_tostring(L, -1) << endl;
 		lua_pop(L, 1);
 	}
 
@@ -112,8 +114,8 @@ int main()
 	lua_pushcfunction(L, DrawPlayer);
 	lua_setglobal(L, "drawPlayerC");
 
-	lua_pushcfunction(L, print);
-	lua_setglobal(L, "printC");
+	lua_pushcfunction(L, MovePlayer);
+	lua_setglobal(L, "movePlayerC");
 
 	/******************************************************* "Init" *******************************************************/
 	player.setFillColor(getOC(Player));
@@ -121,11 +123,11 @@ int main()
 	text.setColor(sf::Color::Red);
 	text.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
-	/*lua_getglobal(L, "init");
+	lua_getglobal(L, "init");
 	lua_pushnumber(L, player.getRadius());
 	error = lua_pcall(L, 1, 0, 0);
 	if (error)
-		cerr << "unable to run:" << lua_tostring(L, -1) << endl;*/
+		cerr << "unable to run: init: " << lua_tostring(L, -1) << endl;
 
 	while (window.isOpen())
 	{
@@ -146,7 +148,7 @@ int main()
 				lua_pushinteger(L, e.key.code);
 				error = lua_pcall(L, 1, 0, 0);
 				if (error)
-					cerr << "unable to run:" << lua_tostring(L, -1) << endl;
+					cerr << "unable to run: keyHandler: " << lua_tostring(L, -1) << endl;
 				break;
 			default:
 				break;
@@ -154,14 +156,14 @@ int main()
 			lua_getglobal(L, "print");
 			error = lua_pcall(L, 0, 0, 0);
 			if (error)
-				cerr << "unable to run:" << lua_tostring(L, -1) << endl;
+				cerr << "unable to run: print: " << lua_tostring(L, -1) << endl;
 		}
 		/************************************************** "Render" ******************************************************/
 		lua_getglobal(L, "render");
 		error = lua_pcall(L, 0, 0, 0);
 		if (error)
 		{
-			cerr << "unable to run:" << lua_tostring(L, -1) << endl;
+			cerr << "unable to run: render: " << lua_tostring(L, -1) << endl;
 			lua_pop(L, 1);
 		}
 	}
