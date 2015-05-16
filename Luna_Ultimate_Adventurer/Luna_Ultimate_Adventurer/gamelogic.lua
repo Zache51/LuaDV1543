@@ -1,3 +1,5 @@
+msg = "a "
+
 player = {}
 player["x"] = 0
 player["y"] = 0
@@ -32,4 +34,17 @@ function render()
 	
 	displayWindowC();
 	return 1;
+end
+
+function keyHandler(code)
+	local var = code
+	if(var == 57) then
+		msg = "testing"
+	else
+		msg = "a "
+	end
+end
+
+function print()
+	printC(msg);
 end

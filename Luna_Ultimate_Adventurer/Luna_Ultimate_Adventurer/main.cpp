@@ -21,6 +21,14 @@ CircleShape player = CircleShape(10.f);
 RenderWindow window = RenderWindow(VideoMode(1200, 800), "Luna the Ultimate Adventurer");
 Text text;
 
+int print(lua_State* L)
+{
+	string msg = lua_tostring(L, 1);
+	lua_pop(L, 1);
+	cout << msg;
+	return 0;
+}
+
 Color getOC(Object id)
 {
 	switch (id)
@@ -90,7 +98,7 @@ int main()
 		cerr << "unable to run:" << lua_tostring(L, -1) << endl;
 		lua_pop(L, 1);
 	}
-	
+
 	/*********************************************** "Add functions to Lua" ***********************************************/
 	lua_pushcfunction(L, DisplayWindow);
 	lua_setglobal(L, "displayWindowC");
@@ -104,23 +112,50 @@ int main()
 	lua_pushcfunction(L, DrawPlayer);
 	lua_setglobal(L, "drawPlayerC");
 
+	lua_pushcfunction(L, print);
+	lua_setglobal(L, "printC");
+
 	/******************************************************* "Init" *******************************************************/
 	player.setFillColor(getOC(Player));
 	text.setCharacterSize(60);
 	text.setColor(sf::Color::Red);
 	text.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
-	lua_getglobal(L, "init");
+	/*lua_getglobal(L, "init");
 	lua_pushnumber(L, player.getRadius());
 	error = lua_pcall(L, 1, 0, 0);
 	if (error)
-		cerr << "unable to run:" << lua_tostring(L, -1) << endl;
+		cerr << "unable to run:" << lua_tostring(L, -1) << endl;*/
 
 	while (window.isOpen())
 	{
 		/************************************************** "Update" ******************************************************/
 		/************************************************ "KeyHandler" ****************************************************/
-		
+		Event e;
+		int code = 0;
+		while (window.pollEvent(e))
+		{
+			switch (e.type)
+			{
+			case Event::Closed:
+				window.close();
+				break;
+			case sf::Event::KeyPressed:
+				lua_getglobal(L, "keyHandler");
+				code = e.key.code;
+				lua_pushinteger(L, e.key.code);
+				error = lua_pcall(L, 1, 0, 0);
+				if (error)
+					cerr << "unable to run:" << lua_tostring(L, -1) << endl;
+				break;
+			default:
+				break;
+			}
+			lua_getglobal(L, "print");
+			error = lua_pcall(L, 0, 0, 0);
+			if (error)
+				cerr << "unable to run:" << lua_tostring(L, -1) << endl;
+		}
 		/************************************************** "Render" ******************************************************/
 		lua_getglobal(L, "render");
 		error = lua_pcall(L, 0, 0, 0);

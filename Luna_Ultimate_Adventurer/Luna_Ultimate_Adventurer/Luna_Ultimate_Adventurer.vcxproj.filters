@@ -42,4 +42,7 @@
   <ItemGroup>
     <Library Include="LuaLib.lib" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="gamelogic.lua" />
+  </ItemGroup>
 </Project>
