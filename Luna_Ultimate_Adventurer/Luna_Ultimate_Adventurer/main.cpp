@@ -18,7 +18,7 @@ enum Object
 };
 
 CircleShape player = CircleShape(10.f);
-RenderWindow window(VideoMode(1200, 800), "Luna the Ultimate Adventurer");
+RenderWindow window = RenderWindow(VideoMode(1200, 800), "Luna the Ultimate Adventurer");
 Text text;
 
 Color getOC(Object id)
@@ -43,6 +43,41 @@ Color getOC(Object id)
 	return Color(255, 255, 255, 255);
 }
 
+int DisplayWindow(lua_State * L)
+{
+	window.display();
+	return 0;
+}
+
+int ClearWindow(lua_State * L)
+{
+	window.clear();
+	return 0;
+}
+
+int DrawSquare(lua_State * L)
+{
+	float posX = lua_tonumber(L, 1);
+	float posY = lua_tonumber(L, 2);
+	float dimensions = lua_tonumber(L, 3);
+	int object = lua_tointeger(L, 4);
+	object = 2;
+	lua_pop(L, 4);
+
+	RectangleShape shape = RectangleShape(Vector2f(dimensions, dimensions));
+	shape.setPosition(Vector2f(posX, posY));
+	shape.setFillColor(getOC((Object)object));
+
+	window.draw(shape);
+	return 0;
+}
+
+int DrawPlayer(lua_State * L)
+{
+	window.draw(player);
+	return 0;
+}
+
 int main()
 {
 	/***************************************************** "Load Lua" *****************************************************/
@@ -56,7 +91,19 @@ int main()
 		lua_pop(L, 1);
 	}
 	
-	/************************************************** "Push functions" **************************************************/
+	/*********************************************** "Add functions to Lua" ***********************************************/
+	lua_pushcfunction(L, DisplayWindow);
+	lua_setglobal(L, "displayWindowC");
+	
+	lua_pushcfunction(L, ClearWindow);
+	lua_setglobal(L, "clearWindowC");
+
+	lua_pushcfunction(L, DrawSquare);
+	lua_setglobal(L, "drawSquareC");
+
+	lua_pushcfunction(L, DrawPlayer);
+	lua_setglobal(L, "drawPlayerC");
+
 	/******************************************************* "Init" *******************************************************/
 	player.setFillColor(getOC(Player));
 	text.setCharacterSize(60);
@@ -73,7 +120,15 @@ int main()
 	{
 		/************************************************** "Update" ******************************************************/
 		/************************************************ "KeyHandler" ****************************************************/
+		
 		/************************************************** "Render" ******************************************************/
+		lua_getglobal(L, "render");
+		error = lua_pcall(L, 0, 0, 0);
+		if (error)
+		{
+			cerr << "unable to run:" << lua_tostring(L, -1) << endl;
+			lua_pop(L, 1);
+		}
 	}
 
 
