@@ -11,10 +11,18 @@ worldPos["y"] = 1
 dimensions = 40
 worldWidth = 30
 worldHeight = 20
+
 world = {}
 
 function init(playerRadius)
 	player["radius"] = playerRadius
+	for i=1, worldHeight, 1
+	do
+		world[i] = {}
+	end
+	
+	lvl = assert(loadfile(0))
+	lvl()
 end
 
 function keyHandler(code)
@@ -36,16 +44,15 @@ end
 function render()
 	clearWindowC();
 	
-	--[[
+	--[[--]]
 	for i=1, worldHeight, 1
 	do
 		for j=1, worldWidth, 1
 		do
-			world[i][j] = 3;
 			drawSquareC((j-1) * dimensions, (i-1) * dimensions, dimensions, world[i][j]);
 		end
 	end
-	--]]
+	
 		
 	drawPlayerC()
 	

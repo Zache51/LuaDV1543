@@ -17,7 +17,7 @@ enum Object
 	Goal   = 6
 };
 
-CircleShape player = CircleShape(10.f);
+CircleShape player = CircleShape(20.f);
 RenderWindow window = RenderWindow(VideoMode(1200, 800), "Luna the Ultimate Adventurer");
 Text text;
 
@@ -61,7 +61,6 @@ int DrawSquare(lua_State * L)
 	float posY = lua_tonumber(L, 2);
 	float dimensions = lua_tonumber(L, 3);
 	int object = lua_tointeger(L, 4);
-	object = 2;
 	lua_pop(L, 4);
 
 	RectangleShape shape = RectangleShape(Vector2f(dimensions, dimensions));
@@ -167,9 +166,6 @@ int main()
 			lua_pop(L, 1);
 		}
 	}
-
-
-	system("pause");
 
 	return 0;
 }
