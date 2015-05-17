@@ -1,21 +1,21 @@
 msg = -1
 
+tileSize = 0
+
 player = {}
 player["x"] = 1
 player["y"] = 1
-player["radius"] = 0
 
 worldPos={}
 worldPos["x"] = 1
 worldPos["y"] = 1
-dimensions = 40
 worldWidth = 30
 worldHeight = 20
 
 world = {}
 
-function init(playerRadius)
-	player["radius"] = playerRadius
+function init(tilesize)
+	tileSize = tilesize
 	for i=1, worldHeight, 1
 	do
 		world[i] = {}
@@ -65,7 +65,7 @@ function keyHandler(code)
 	player["x"] = moveX or player["x"]
 	player["y"] = moveY or player["y"]
 
-	movePlayerC((player["x"] - 1) * dimensions, (player["y"] - 1) * dimensions)
+	movePlayerC((player["x"] - 1) * tileSize, (player["y"] - 1) * tileSize)
 end
 
 function render()
@@ -76,7 +76,7 @@ function render()
 	do
 		for j=1, worldWidth, 1
 		do
-			drawSquareC((j-1) * dimensions, (i-1) * dimensions, dimensions, world[i][j]);
+			drawTileC((j-1) * tileSize, (i-1) * tileSize, world[i][j]);
 		end
 	end
 	

@@ -1,7 +1,8 @@
-
 #include "lua.hpp"
 #include <iostream>
 #include <SFML\Graphics.hpp>
+
+#define TILESIZE 40.0f
 
 using namespace std;
 using namespace sf;
@@ -17,9 +18,9 @@ enum Object
 	Goal   = 6
 };
 
-CircleShape player = CircleShape(20.f);
+CircleShape player = CircleShape(TILESIZE / 2); 
+Vector2f baseTile = Vector2f(TILESIZE, TILESIZE);
 RenderWindow window = RenderWindow(VideoMode(1200, 800), "Luna the Ultimate Adventurer");
-Text text;
 
 Color getOC(Object id)
 {
@@ -43,41 +44,40 @@ Color getOC(Object id)
 	return Color(255, 255, 255, 255);
 }
 
-int DisplayWindow(lua_State * L)
+int displayWindow(lua_State * L)
 {
 	window.display();
 	return 0;
 }
 
-int ClearWindow(lua_State * L)
+int clearWindow(lua_State * L)
 {
 	window.clear();
 	return 0;
 }
 
-int DrawSquare(lua_State * L)
+int drawTile(lua_State * L)
 {
 	float posX = lua_tonumber(L, 1);
 	float posY = lua_tonumber(L, 2);
-	float dimensions = lua_tonumber(L, 3);
-	int object = lua_tointeger(L, 4);
-	lua_pop(L, 4);
+	Object object = (Object)lua_tointeger(L, 3);
+	lua_pop(L, 3);
 
-	RectangleShape shape = RectangleShape(Vector2f(dimensions, dimensions));
+	RectangleShape shape = RectangleShape(baseTile);
 	shape.setPosition(Vector2f(posX, posY));
-	shape.setFillColor(getOC((Object)object));
+	shape.setFillColor(getOC(object));
 
 	window.draw(shape);
 	return 0;
 }
 
-int DrawPlayer(lua_State * L)
+int drawPlayer(lua_State * L)
 {
 	window.draw(player);
 	return 0;
 }
 
-int MovePlayer(lua_State* L)
+int movePlayer(lua_State* L)
 {
 	float posX = lua_tonumber(L, 1);
 	float posY = lua_tonumber(L, 2);
@@ -87,7 +87,7 @@ int MovePlayer(lua_State* L)
 	return 0;
 }
 
-int Print(lua_State* L)
+int print(lua_State* L)
 {
 	float msg = lua_tonumber(L, 1);
 	lua_pop(L, 1);
@@ -110,32 +110,29 @@ int main()
 	}
 
 	/*********************************************** "Add functions to Lua" ***********************************************/
-	lua_pushcfunction(L, DisplayWindow);
+	lua_pushcfunction(L, displayWindow);
 	lua_setglobal(L, "displayWindowC");
 	
-	lua_pushcfunction(L, ClearWindow);
+	lua_pushcfunction(L, clearWindow);
 	lua_setglobal(L, "clearWindowC");
 
-	lua_pushcfunction(L, DrawSquare);
-	lua_setglobal(L, "drawSquareC");
+	lua_pushcfunction(L, drawTile);
+	lua_setglobal(L, "drawTileC");
 
-	lua_pushcfunction(L, DrawPlayer);
+	lua_pushcfunction(L, drawPlayer);
 	lua_setglobal(L, "drawPlayerC");
 
-	lua_pushcfunction(L, MovePlayer);
+	lua_pushcfunction(L, movePlayer);
 	lua_setglobal(L, "movePlayerC");
 
-	lua_pushcfunction(L, Print);
+	lua_pushcfunction(L, print);
 	lua_setglobal(L, "printC");
 
 	/******************************************************* "Init" *******************************************************/
 	player.setFillColor(getOC(Player));
-	text.setCharacterSize(60);
-	text.setColor(sf::Color::Red);
-	text.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
 	lua_getglobal(L, "init");
-	lua_pushnumber(L, player.getRadius());
+	lua_pushnumber(L, TILESIZE);
 	error = lua_pcall(L, 1, 0, 0);
 	if (error)
 		cerr << "unable to run: init: " << lua_tostring(L, -1) << endl;
