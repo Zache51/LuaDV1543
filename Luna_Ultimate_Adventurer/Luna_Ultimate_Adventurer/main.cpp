@@ -87,6 +87,15 @@ int MovePlayer(lua_State* L)
 	return 0;
 }
 
+int Print(lua_State* L)
+{
+	float msg = lua_tonumber(L, 1);
+	lua_pop(L, 1);
+
+	cout << msg << " ";
+	return 0;
+}
+
 int main()
 {
 	/***************************************************** "Load Lua" *****************************************************/
@@ -115,6 +124,9 @@ int main()
 
 	lua_pushcfunction(L, MovePlayer);
 	lua_setglobal(L, "movePlayerC");
+
+	lua_pushcfunction(L, Print);
+	lua_setglobal(L, "printC");
 
 	/******************************************************* "Init" *******************************************************/
 	player.setFillColor(getOC(Player));
