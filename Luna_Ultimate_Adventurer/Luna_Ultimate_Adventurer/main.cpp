@@ -2,7 +2,9 @@
 #include <iostream>
 #include <SFML\Graphics.hpp>
 
-#define TILESIZE 40.0f
+#define TILESIZE 20.0f
+#define PIXELWIDTH 800
+#define PIXELHEIGHT 640
 
 using namespace std;
 using namespace sf;
@@ -20,7 +22,9 @@ enum Object
 
 CircleShape player = CircleShape(TILESIZE / 2); 
 Vector2f baseTile = Vector2f(TILESIZE, TILESIZE);
-RenderWindow window = RenderWindow(VideoMode(1200, 800), "Luna the Ultimate Adventurer");
+RenderWindow window = RenderWindow(VideoMode(PIXELWIDTH, PIXELHEIGHT), "Luna the Ultimate Adventurer");
+
+Text text;
 
 Color getOC(Object id)
 {
@@ -77,6 +81,24 @@ int drawPlayer(lua_State * L)
 	return 0;
 }
 
+int drawText(lua_State * L)
+{
+	string t = lua_tostring(L, 1);
+	float posX = lua_tonumber(L, 2);
+	float posY = lua_tonumber(L, 3);
+
+	text.setString(t);
+	float width = text.getLocalBounds().width;
+	float height = text.getLocalBounds().height;
+	text.setPosition(posX - width, posY - height / 2);
+
+	float padding = 30;
+
+	window.draw(text);
+	lua_pop(L, 3);
+	return 0;
+}
+
 int movePlayer(lua_State* L)
 {
 	float posX = lua_tonumber(L, 1);
@@ -122,6 +144,9 @@ int main()
 	lua_pushcfunction(L, drawPlayer);
 	lua_setglobal(L, "drawPlayerC");
 
+	lua_pushcfunction(L, drawText);
+	lua_setglobal(L, "drawTextC");
+
 	lua_pushcfunction(L, movePlayer);
 	lua_setglobal(L, "movePlayerC");
 
@@ -131,9 +156,22 @@ int main()
 	/******************************************************* "Init" *******************************************************/
 	player.setFillColor(getOC(Player));
 
+	Font font;
+	if (!font.loadFromFile("Aller_Rg.ttf"))
+	{
+		cout << "Font not loaded" << endl;
+	}
+
+	text.setFont(font);
+	text.setCharacterSize(20);
+	text.setColor(sf::Color::Red);
+	text.setStyle(sf::Text::Bold);
+
 	lua_getglobal(L, "init");
 	lua_pushnumber(L, TILESIZE);
-	error = lua_pcall(L, 1, 0, 0);
+	lua_pushnumber(L, PIXELWIDTH);
+	lua_pushnumber(L, PIXELHEIGHT);
+	error = lua_pcall(L, 3, 0, 0);
 	if (error)
 		cerr << "unable to run: init: " << lua_tostring(L, -1) << endl;
 
@@ -161,10 +199,6 @@ int main()
 			default:
 				break;
 			}
-			lua_getglobal(L, "print");
-			error = lua_pcall(L, 0, 0, 0);
-			if (error)
-				cerr << "unable to run: print: " << lua_tostring(L, -1) << endl;
 		}
 		/************************************************** "Render" ******************************************************/
 		lua_getglobal(L, "render");
