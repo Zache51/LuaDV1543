@@ -9,6 +9,18 @@
 using namespace std;
 using namespace sf;
 
+/*
+Win condition:
+Reach the goal (blue circle)
+
+Lose condition:
+Deplete time or thirst
+
+Controls:
+WASD or arrow keys to move
+E to replenish thirst
+*/
+
 enum Object
 {
 	Water  = 0,
@@ -21,6 +33,7 @@ enum Object
 };
 
 CircleShape player = CircleShape(TILESIZE / 2); 
+CircleShape goal = CircleShape(TILESIZE / 2);
 Vector2f baseTile = Vector2f(TILESIZE, TILESIZE);
 RenderWindow window = RenderWindow(VideoMode(PIXELWIDTH, PIXELHEIGHT), "Luna the Ultimate Adventurer");
 
@@ -43,9 +56,14 @@ Color getOC(Object id)
 	case Player:
 		return Color(231, 47, 39, 255);
 	case Goal:
-		return Color(10, 10, 10, 255);
+		return Color(25, 25, 255, 255);
 	}
 	return Color(255, 255, 255, 255);
+}
+
+float corPos(float f)
+{
+	return (f - 1) * TILESIZE;
 }
 
 int displayWindow(lua_State * L)
@@ -62,8 +80,8 @@ int clearWindow(lua_State * L)
 
 int drawTile(lua_State * L)
 {
-	float posX = lua_tonumber(L, 1);
-	float posY = lua_tonumber(L, 2);
+	float posX = corPos(lua_tonumber(L, 1));
+	float posY = corPos(lua_tonumber(L, 2));
 	Object object = (Object)lua_tointeger(L, 3);
 	lua_pop(L, 3);
 
@@ -78,6 +96,12 @@ int drawTile(lua_State * L)
 int drawPlayer(lua_State * L)
 {
 	window.draw(player);
+	return 0;
+}
+
+int drawGoal(lua_State * L)
+{
+	window.draw(goal);
 	return 0;
 }
 
@@ -99,22 +123,29 @@ int drawText(lua_State * L)
 	return 0;
 }
 
-int movePlayer(lua_State* L)
+int moveEntity(lua_State* L)
 {
-	float posX = lua_tonumber(L, 1);
-	float posY = lua_tonumber(L, 2);
+	float posX = corPos(lua_tonumber(L, 1));
+	float posY = corPos(lua_tonumber(L, 2));
+	Object o = (Object)lua_tointeger(L, 3);
 	lua_pop(L, 2);
 
-	player.setPosition(posX, posY);
+	if (o == 5)
+	{
+		player.setPosition(posX, posY);
+	}
+	else if (o == 6)
+	{
+		goal.setPosition(posX, posY);
+	}
+	
 	return 0;
 }
 
-int print(lua_State* L)
+int sleep(lua_State * L)
 {
-	float msg = lua_tonumber(L, 1);
+	sf::sleep(sf::seconds(lua_tonumber(L, 1)));
 	lua_pop(L, 1);
-
-	cout << msg << " ";
 	return 0;
 }
 
@@ -144,17 +175,21 @@ int main()
 	lua_pushcfunction(L, drawPlayer);
 	lua_setglobal(L, "drawPlayerC");
 
+	lua_pushcfunction(L, drawGoal);
+	lua_setglobal(L, "drawGoalC");
+
 	lua_pushcfunction(L, drawText);
 	lua_setglobal(L, "drawTextC");
 
-	lua_pushcfunction(L, movePlayer);
-	lua_setglobal(L, "movePlayerC");
+	lua_pushcfunction(L, moveEntity);
+	lua_setglobal(L, "moveEntityC");
 
-	lua_pushcfunction(L, print);
-	lua_setglobal(L, "printC");
+	lua_pushcfunction(L, sleep);
+	lua_setglobal(L, "sleepC");
 
 	/******************************************************* "Init" *******************************************************/
 	player.setFillColor(getOC(Player));
+	goal.setFillColor(getOC(Goal));
 
 	Font font;
 	if (!font.loadFromFile("Aller_Rg.ttf"))
