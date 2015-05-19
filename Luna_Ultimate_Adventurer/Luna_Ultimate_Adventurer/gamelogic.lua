@@ -20,6 +20,8 @@ world = {}
 timeR    = 0;
 thirstR  = 0;
 
+FILENAME = "map.lua"
+
 --[[
 Win condition:
 Reach the goal (blue circle)
@@ -74,21 +76,22 @@ function winOrLose()
 end
 
 function newGame()
-	lvl = assert(loadfile(0))
+	lvl = assert(loadfile(FILENAME))
 	lvl()
-
+	
 	moveEntityC(player["x"], player["y"], 5)
 	moveEntityC(goal["x"], goal["y"], 6)
 	
+	--[[--]]
 	timeR    = 180;
 	thirstR  = 80;
+	
 end
 
 function keyHandler(key)
 	local x = player["x"]
 	local y = player["y"]
 
-	print(key)
 	if(key == 0 or key == 71) then
 		if(player["x"] ~= 1) then
 			x = x - 1
@@ -110,6 +113,8 @@ function keyHandler(key)
 			thirstR = 80
 			timeR = timeR - 2
 		end
+	elseif(key == 16) then
+		saveLevel(FILENAME);
 	end
 	
 	if (x ~= player["x"] or y ~= player["y"]) then
@@ -152,4 +157,43 @@ function render()
 	
 	displayWindowC();
 	return 1;
+end
+
+function ascii34(middle)
+return string.char(34) .. middle .. string.char(34)
+end
+
+function saveLevel(filename)
+	file = io.open(filename, "w")
+	
+	file:write("player = {}\n")
+	file:write("player[".. ascii34("x") .."] = " .. player["x"] .. "\n")
+	file:write("player[".. ascii34("y") .."] = " .. player["y"] .. "\n")
+	
+	--[[
+	file:write("\n")
+	
+	file:write("timeR    = " .. timeR .. "\n")
+	file:write("thirstR  = " .. thirstR .. "\n")
+	--]]
+	
+	file:write("\n")
+	
+	file:write("goal = {}\n")
+	file:write("goal[".. ascii34("x") .."] = " .. goal["x"] .. "\n")
+	file:write("goal[".. ascii34("y") .."] = " .. goal["y"] .. "\n")
+	
+	file:write("\n")
+	
+	file:write("world = {}")
+	for i = 1, worldHeight, 1 do
+		toWrite = "\n" .. "world[" .. i .. "] = {"
+		
+		toWrite = toWrite .. world[i][1]
+		for j = 2, worldWidth, 1 do
+			toWrite = toWrite .. ", " .. world[i][j]
+		end
+		file:write(toWrite .. "}")
+	end
+	file:close()
 end
