@@ -220,16 +220,21 @@ int main()
 		{
 			switch (e.type)
 			{
+			case sf::Event::KeyPressed:
+				code = e.key.code;
+				if (code != 36)// 36 = ESC
+				{
+					lua_getglobal(L, "keyHandler");
+					lua_pushinteger(L, e.key.code);
+					error = lua_pcall(L, 1, 0, 0);
+					if (error)
+						cerr << "unable to run: keyHandler: " << lua_tostring(L, -1) << endl;
+					break;
+				}
+				else
+					// Go to next case - Close window
 			case Event::Closed:
 				window.close();
-				break;
-			case sf::Event::KeyPressed:
-				lua_getglobal(L, "keyHandler");
-				code = e.key.code;
-				lua_pushinteger(L, e.key.code);
-				error = lua_pcall(L, 1, 0, 0);
-				if (error)
-					cerr << "unable to run: keyHandler: " << lua_tostring(L, -1) << endl;
 				break;
 			default:
 				break;

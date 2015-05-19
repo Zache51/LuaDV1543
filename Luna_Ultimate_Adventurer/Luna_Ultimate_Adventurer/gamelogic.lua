@@ -17,6 +17,8 @@ worldWidth = 40
 worldHeight = 32
 world = {}
 
+editor = false
+
 timeR    = 0;
 thirstR  = 0;
 
@@ -89,26 +91,36 @@ function keyHandler(key)
 	local y = player["y"]
 
 	print(key)
-	if(key == 0 or key == 71) then
+	if(key == 0 or key == 71) then		--LEFT
 		if(player["x"] ~= 1) then
 			x = x - 1
 		end
-	elseif(key == 3 or key == 72) then
+	elseif(key == 3 or key == 72) then	--RIGHT
 		if(player["x"] ~= worldWidth) then
 			x = x + 1
 		end
-	elseif(key == 22 or key == 73) then
+	elseif(key == 22 or key == 73) then --UP
 		if(player["y"] ~= 1) then
 			y = y - 1
 		end
-	elseif(key == 18 or key == 74) then
+	elseif(key == 18 or key == 74) then	--DOWN
 		if(player["y"] ~= worldHeight) then
 			y = y + 1
 		end
-	elseif(key == 4) then
+	elseif(key == 4) then				--E
 		if (waterFound() == true) then
 			thirstR = 80
 			timeR = timeR - 2
+		end
+	end
+
+	if(key == 53) then					--§
+		if(editor) then
+			editor = false
+			print("Editor left")
+		else
+			editor = true
+			print("Editor entered")
 		end
 	end
 	
