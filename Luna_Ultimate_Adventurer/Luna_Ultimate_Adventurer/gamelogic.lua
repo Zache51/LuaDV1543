@@ -18,6 +18,9 @@ worldHeight = 32
 world = {}
 
 editor = false
+mPosX = 0;
+mPosY = 0;
+tiletype = 0;
 
 timeR    = 0;
 thirstR  = 0;
@@ -63,7 +66,7 @@ end
 
 function restartProcess()
 	displayWindowC();
-	sleepC(5);
+	sleepC(2);
 	newGame();
 end
 
@@ -90,11 +93,21 @@ function newGame()
 	
 end
 
+function edit(x, y)
+	mPosX = x;
+	mPosY = y;
+
+	if(editor) then
+		--print(mPosX, mPosY)
+		world[mPosY][mPosX] = tiletype
+	end
+end
+
+
 function keyHandler(key)
 	local x = player["x"]
 	local y = player["y"]
-
-	print(key)
+	
 	if(key == 0 or key == 71) then		--LEFT
 		if(player["x"] ~= 1) then
 			x = x - 1
@@ -120,7 +133,7 @@ function keyHandler(key)
 		saveLevel(FILENAME);
 	end
 
-	if(key == 53) then					--§
+	if(key == 53) then					--§ - Editor
 		if(editor) then
 			editor = false
 			print("Editor left")
@@ -128,6 +141,23 @@ function keyHandler(key)
 			editor = true
 			print("Editor entered")
 		end
+	elseif(key == 27 and editor) then	--1 - Water
+		tiletype = 0
+		print("Tile selected: Water")
+	elseif(key == 28 and editor) then	--2 - Bridge
+		tiletype = 1
+		print("Tile selected: Bridge")
+	elseif(key == 29 and editor) then	--3 - Tree
+		tiletype = 2
+		print("Tile selected: Tree")
+	elseif(key == 30 and editor) then	--4 - Stone
+		tiletype = 3
+		print("Tile selected: Stone")
+	elseif(key == 31 and editor) then	--5 - Field
+		tiletype = 4
+		print("Tile selected: Field")
+	elseif(key == 26 and editor) then	--0 - RESET
+		newGame()
 	end
 	
 	if (x ~= player["x"] or y ~= player["y"]) then

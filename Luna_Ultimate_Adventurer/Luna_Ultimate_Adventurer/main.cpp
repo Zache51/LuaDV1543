@@ -149,6 +149,19 @@ int sleep(lua_State * L)
 	return 0;
 }
 
+int getTile(lua_State * L, int mPosX, int mPosY)
+{
+	int y = mPosY;
+	int x = mPosX;
+	y = (y / TILESIZE) + 1;
+	x = (x / TILESIZE) + 1;
+
+	lua_getglobal(L, "edit");
+	lua_pushinteger(L, x);
+	lua_pushinteger(L, y);
+	return lua_pcall(L, 2, 0, 0);
+}
+
 int main()
 {
 	/***************************************************** "Load Lua" *****************************************************/
@@ -214,14 +227,18 @@ int main()
 	{
 		/************************************************ "KeyHandler" ****************************************************/
 		Event e;
-		int code = 0;
 		while (window.pollEvent(e))
 		{
 			switch (e.type)
 			{
+			case sf::Event::MouseButtonPressed:
+
+				error = getTile(L, e.mouseButton.x, e.mouseButton.y);
+				if (error)
+					cerr << "unable to run: edit: " << lua_tostring(L, -1) << endl;
+				break;
 			case sf::Event::KeyPressed:
-				code = e.key.code;
-				if (code != 36)// 36 = ESC
+				if (e.key.code != 36)// 36 = ESC
 				{
 					lua_getglobal(L, "keyHandler");
 					lua_pushinteger(L, e.key.code);
